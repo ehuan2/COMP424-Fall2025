@@ -1,18 +1,18 @@
-# Reversi/Othello!
+# Ataxx!
 
-**Project Description & Template** : https://www.overleaf.com/read/vnygbjryrxrt#7b70cb
-
-<p align="center">
-  <img src="https://t4.ftcdn.net/jpg/00/90/53/03/240_F_90530312_4Mg3HCsCMW91NVHKWNlBaRo8F5pHhN3c.jpg?w=690&h=388&c=crop">
-</p>
+**Project Description & Template** : https://www.overleaf.com/read/khdfckprxqtn#a952b1
 
 ## TODO AS TAs:
-- Update helpers.py [DONE, needs testing]
-- Update simulator.py [DONE, needs testing]
-- Update UI.py to add obstacles [MOSTLY DONE, needs testing]
-- Create pre-made maps, instead of varying board size [DONE, needs testing]
+- Update helpers.py [DONE ]
+- Update simulator.py [DONE ]
+- Update UI.py to add obstacles [MOSTLY DONE]
+- Create pre-made maps, instead of varying board size [DONE ]
+- Test random agent
+- test autoplay with multiple boards
 - Add GPTAgent
 - Edit documentation to match 
+- Update requirements.txt 
+
 
 ## Setup
 
@@ -56,7 +56,7 @@ There is some randomness (coming from the initial game setup and potentially age
 python simulator.py --player_1 random_agent --player_2 random_agent --autoplay
 ```
 
-During autoplay, boards are drawn randomly between size `--board_size_min` and `--board_size_max` for each iteration. You may try various ranges for your own information and development by providing these variables on the command-line. However, the defaults (to be used during grading) are 6 and 12, so ensure the timing limits are satisfied for every board in this size range. 
+During autoplay, boards are drawn randomly from `--board_roster_dir` for each iteration. You may try various ranges for your own information and development by providing these variables on the command-line. However, the defaults (to be used during grading) are in the `boards/` folder in this repository, so ensure the timing limits are satisfied for every board in this size range. 
 
 **Notes**
 
@@ -99,14 +99,15 @@ You will submit only one code file for grading: student_agent.py. Here are a few
 ```bash
 python simulator.py -h       
 usage: simulator.py [-h] [--player_1 PLAYER_1] [--player_2 PLAYER_2]
-                    [--board_size BOARD_SIZE] [--display]
+                    [--board_path BOARD_PATH] [--display]
                     [--display_delay DISPLAY_DELAY]
 
 optional arguments:
   -h, --help            show this help message and exit
   --player_1 PLAYER_1
   --player_2 PLAYER_2
-  --board_size BOARD_SIZE
+  --board_path BOARD_PATH
+  --board_roster_dir BOARD_ROSTER_DIR
   --display
   --display_delay DISPLAY_DELAY
   --autoplay
@@ -119,7 +120,7 @@ Feel free to open an issue in this repository, or contact us in Ed thread.
 
 ## About
 
-This is a class project for COMP 424, McGill University, Fall 2024 (it was originally forked with the permission of Jackie Cheung).
+This is a class project for COMP 424, McGill University, Fall 2025 (it was originally forked with the permission of Jackie Cheung).
 
 ## License
 

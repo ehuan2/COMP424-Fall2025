@@ -19,7 +19,7 @@ def get_args():
     parser.add_argument(
         "--board_roster_dir",
         type=int,
-        default=6,
+        default="boards/",
         help="In autoplay mode, the path to a directory containing all board files",
     )
     parser.add_argument("--display", action="store_true", default=False)
