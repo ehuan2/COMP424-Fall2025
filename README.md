@@ -6,6 +6,14 @@
   <img src="https://t4.ftcdn.net/jpg/00/90/53/03/240_F_90530312_4Mg3HCsCMW91NVHKWNlBaRo8F5pHhN3c.jpg?w=690&h=388&c=crop">
 </p>
 
+## TODO AS TAs:
+- Update helpers.py [DONE, needs testing]
+- Update simulator.py
+- Update UI.py to add obstacles
+- Create pre-made maps, instead of varying board size
+- Add GPTAgent
+- Edit documentation to match 
+
 ## Setup
 
 To setup the game, clone this repository and install the dependencies:

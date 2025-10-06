@@ -49,6 +49,7 @@ class Simulator:
     def __init__(self, args):
         self.args = args
         # Only play on even-sized boards
+        # TODO: Decide on valid board sizes - 7 is default - but does it matter? Does it need to be odd?
         self.valid_board_sizes = [ i for i in range(self.args.board_size_min, self.args.board_size_max+1) if i % 2 == 0 ]
         #print("Valid sizes: ",self.valid_board_sizes)
 

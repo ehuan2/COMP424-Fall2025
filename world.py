@@ -15,6 +15,8 @@ logging.basicConfig(format="%(levelname)s:%(message)s", level=logging.INFO)
 
 logger = logging.getLogger(__name__)
 
+
+# TODO: Add a "load board" option to pick from one of a few pre-set board layouts. We should hold out some unseen board for testing.
 class World:
     def __init__(
         self,
@@ -88,6 +90,8 @@ class World:
         else:
             self.board_size = board_size
             logger.info(f"Setting board size to {self.board_size}x{self.board_size}")
+
+        # TODO: Modify initialization rules to Ataxx
 
         # Initialize the game board (0: empty, 1: black disc, 2: white disc)
         self.chess_board = np.zeros((self.board_size, self.board_size), dtype=int)
