@@ -22,14 +22,6 @@ Functions:
 """
 
 class MoveCoordinates:
-    #TODO: Add defintion and comments
-
-    def __init__(self, row_src: int, col_src: int, row_dest: int, col_dest: int):
-        self.row_src = row_src
-        self.col_src = col_src
-        self.row_dest = row_dest
-        self.col_dest = col_dest
-
     def __init__(self, src: tuple[int,int], dest: tuple[int, int]):
         self.row_src = src[0]
         self.col_src = src[1]
@@ -71,13 +63,13 @@ def get_two_tile_directions():
             (-2, -2), (-2, 2), (2, -2), (2, 2)] 
 
 def check_move_validity(chess_board, move_coords: MoveCoordinates, player: int) -> bool:
-    # Check src and dest are on the board
-    src_tile = move_coords.get_dest()
-    dest_tile = move_coords.get_src()
+    src_tile = move_coords.get_src()
+    dest_tile = move_coords.get_dest()
 
-    if not (0 <= src_tile[0] < chess_board.shape[0] and 0 <= src_tile[1] < chess_board.shape[0]):
+    # Check src and dest are on the board
+    if not (0 <= src_tile[0] < chess_board.shape[0] and 0 <= src_tile[1] < chess_board.shape[1]):
         return False
-    if not (0 <= dest_tile[0] < chess_board.shape[0] and 0 <= dest_tile[1] < chess_board.shape[0]):
+    if not (0 <= dest_tile[0] < chess_board.shape[0] and 0 <= dest_tile[1] < chess_board.shape[1]):
         return False
 
     # Check dest is empty
@@ -88,10 +80,17 @@ def check_move_validity(chess_board, move_coords: MoveCoordinates, player: int) 
     if not (chess_board[src_tile[0], src_tile[1]] == player):
         return False 
     
+    # Check if distance between discs is in the set of valid directions
+    valid_distances_list = get_directions()
+    valid_distances_list.extend(get_two_tile_directions())
+
+    move_dist = (dest_tile[0] - src_tile[0], dest_tile[1] - src_tile[1])
+
+    if not move_dist in valid_distances_list:
+        return False
+    
     return True
 
-# TODO: Change logic here, since moves that do not capture are valid. Maybe -1 to indicate validity, or a separate "check validity"
-# function that takes the source/destination combination
 def count_disc_count_change(chess_board, move_coords: MoveCoordinates, player: int):
     """
     How many discs are gained by the move specified in move_coords. Total = opponent's discs are captured + duplication disc for single tile moves
@@ -136,9 +135,9 @@ def execute_move(chess_board, move_coords: MoveCoordinates, player: int):
     Note that chess_board is a pass-by-reference in/output parameter.
     Consider copy.deepcopy() of the chess_board if you want to consider numerous possibilities.
     """
-    opponent_map = {0: 1, 1: 0} # This lets us quickly access the value corresponding to the opponent on the board based on current player number
+    opponent_map = {1: 2, 2: 1} # This lets us quickly access the value corresponding to the opponent on the board based on current player number
 
-    if not check_move_validity(chess_board, move_coords): # Throw an exception instead of executing an invalid move. This exception should be handled in the simulator logic
+    if not check_move_validity(chess_board, move_coords, player): # Throw an exception instead of executing an invalid move. This exception should be handled in the simulator logic
         raise Exception(f"Executing an invalid move! Player {player} is moving from ({move_coords.row_src},{move_coords.col_src}) to ({move_coords.row_dest},{move_coords.col_dest})")
 
     r_dest, c_dest = move_coords.get_dest()
@@ -153,11 +152,11 @@ def execute_move(chess_board, move_coords: MoveCoordinates, player: int):
             continue
 
         # If the tile, is an opponent, flip it
-        if chess_board[adj_tile[0], adj_tile[1]] == opponent_map(player):
+        if chess_board[adj_tile[0], adj_tile[1]] == opponent_map[player]:
             chess_board[adj_tile[0], adj_tile[1]] = player
 
     # If the move is two-tiles, empty the source tile
-    r_src, c_src = move_coords.get_dest()
+    r_src, c_src = move_coords.get_src()
     if (np.abs(r_dest - r_src) == 2) or (np.abs(c_dest - c_src) == 2):
         chess_board[r_src, c_src] = 0
 
@@ -187,7 +186,6 @@ def check_endgame(chess_board,player,opponent):
     p1_score = np.sum(chess_board == 2)
     return is_endgame, p0_score, p1_score
 
-# TODO: Updated - needs testing
 def get_valid_moves(chess_board,player):
     """
     Get all valid moves given the chess board and player.

@@ -12,7 +12,7 @@
 
 from agents.agent import Agent
 from store import register_agent
-from helpers import get_valid_moves, count_capture, execute_move, check_endgame
+from helpers import get_valid_moves, execute_move, check_endgame
 import copy
 import random
 

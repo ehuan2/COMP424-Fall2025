@@ -58,7 +58,6 @@ class Simulator:
         else:
             self.board_options = []
 
-    # TODO: Replace board size with board path
     def reset(self, swap_players=False, board_fpath=None):
         """
         Reset the game
@@ -71,8 +70,7 @@ class Simulator:
             if not None, set the board size
         """
         if board_fpath is None:
-            board_fpath = self.args.board_fpath
-            #TODO: Is it here that I should add logic for handling the set of available boards?
+            board_fpath = self.args.board_path
         if swap_players:
             player_1, player_2 = self.args.player_2, self.args.player_1
         else:
@@ -113,7 +111,7 @@ class Simulator:
         with all_logging_disabled():
             for i in range(self.args.autoplay_runs):
                 swap_players = i % 2 == 0
-                board_fpath = self.board_options[ np.random.randint(len(self.valid_board_sizes)) ] 
+                board_fpath = self.board_options[ np.random.randint(len(self.board_options)) ] 
                 p0_score, p1_score, p0_time, p1_time = self.run(
                     swap_players=swap_players, board_fpath=board_fpath
                 )

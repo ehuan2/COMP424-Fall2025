@@ -9,7 +9,7 @@ import logging
 from store import AGENT_REGISTRY
 from constants import *
 import sys
-from helpers import check_move_validity, execute_move, check_endgame, random_move, get_valid_moves
+from helpers import check_move_validity, execute_move, check_endgame, random_move, get_valid_moves, MoveCoordinates
 
 logging.basicConfig(format="%(levelname)s:%(message)s", level=logging.INFO)
 
@@ -91,7 +91,8 @@ class World:
             logger.info(f"Setting board path to {self.board_fpath}")
 
         # Initialize the game board from file
-        self.chess_board = np.loadtxt(board_fpath, dtype=int, delimiter=',')
+        self.chess_board = np.loadtxt(self.board_fpath, dtype=int, delimiter=',')
+        self.board_size = self.chess_board.shape[0] # We assume it is always square
 
         # Whose turn to step
         self.turn = 0
@@ -142,7 +143,7 @@ class World:
         else:
             self.p1_time.append(time_taken)
 
-    def step(self):
+    def step(self): 
         """
         Take a step in the game world.
         Runs the agents' step function and updates the game board accordingly.
@@ -156,7 +157,7 @@ class World:
         cur_player = self.get_current_player()
         opponent = self.get_current_opponent()
 
-        valid_moves = get_valid_moves(self.chess_board,cur_player)
+        valid_moves = get_valid_moves(self.chess_board, cur_player)
 
         if not valid_moves:
             logger.info(f"Player {self.player_names[self.turn]} must pass due to having no valid moves.")
@@ -165,7 +166,7 @@ class World:
             try:
                 # Run the agent's step function
                 start_time = time()
-                move_coords = self.get_current_agent().step( # TODO: THIS SHOULD RETURN MoveCoordinates
+                move_coords = self.get_current_agent().step( # We expect this to return MoveCoordinates
                     deepcopy(self.chess_board),
                     cur_player,
                     opponent,
@@ -174,7 +175,7 @@ class World:
                 self.update_player_time(time_taken)
 
                 if not check_move_validity(self.chess_board, move_coords, cur_player):
-                    raise ValueError(f"Invalid move by player {cur_player}: {move_pos}")
+                    raise ValueError(f"Invalid move by player {cur_player}: SRC {move_coords.get_src()}, DEST {move_coords.get_dest()}")
 
             except BaseException as e:
                 ex_type = type(e).__name__
@@ -188,12 +189,12 @@ class World:
                     )
                 )
                 print("Executing Random Move!")
-                move_pos = random_move(self.chess_board,cur_player)
+                move_coords = random_move(self.chess_board,cur_player)
 
             # Execute move
-            execute_move(self.chess_board,move_pos, cur_player)
+            execute_move(self.chess_board,move_coords, cur_player)
             logger.info(
-                f"Player {self.player_names[self.turn]} places at {move_pos}. Time taken this turn (in seconds): {time_taken}"
+                f"Player {self.player_names[self.turn]} places at SRC {move_coords.get_src()}, DEST {move_coords.get_dest()}. Time taken this turn (in seconds): {time_taken}"
             )
 
         # Change turn

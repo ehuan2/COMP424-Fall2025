@@ -8,9 +8,9 @@
 
 ## TODO AS TAs:
 - Update helpers.py [DONE, needs testing]
-- Update simulator.py
-- Update UI.py to add obstacles
-- Create pre-made maps, instead of varying board size
+- Update simulator.py [DONE, needs testing]
+- Update UI.py to add obstacles [MOSTLY DONE, needs testing]
+- Create pre-made maps, instead of varying board size [DONE, needs testing]
 - Add GPTAgent
 - Edit documentation to match 
 
