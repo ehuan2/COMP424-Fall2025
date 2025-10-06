@@ -9,20 +9,19 @@ import logging
 from store import AGENT_REGISTRY
 from constants import *
 import sys
-from helpers import count_capture, execute_move, check_endgame, random_move, get_valid_moves
+from helpers import check_move_validity, execute_move, check_endgame, random_move, get_valid_moves
 
 logging.basicConfig(format="%(levelname)s:%(message)s", level=logging.INFO)
 
 logger = logging.getLogger(__name__)
 
 
-# TODO: Add a "load board" option to pick from one of a few pre-set board layouts. We should hold out some unseen board for testing.
 class World:
     def __init__(
         self,
         player_1="random_agent",
         player_2="random_agent",
-        board_size=None,
+        board_fpath=None,
         display_ui=False,
         display_delay=0.4,
         display_save=False,
@@ -81,27 +80,18 @@ class World:
 
         self.player_names = {PLAYER_1_ID: PLAYER_1_NAME, PLAYER_2_ID: PLAYER_2_NAME}
 
-        if board_size is None:
-            # Random board size, ensuring even numbers for Reversi Othello
-            self.board_size = np.random.choice([6, 8, 10, 12])
+        if board_fpath is None:
+            # Default to empty board
+            self.board_fpath = "boards/empty_7x7.csv"
             logger.info(
-                f"No board size specified. Randomly generating size: {self.board_size}x{self.board_size}"
+                f"No board path specified. Using empty board at {self.board_fpath}"
             )
         else:
-            self.board_size = board_size
-            logger.info(f"Setting board size to {self.board_size}x{self.board_size}")
+            self.board_fpath = board_fpath
+            logger.info(f"Setting board path to {self.board_fpath}")
 
-        # TODO: Modify initialization rules to Ataxx
-
-        # Initialize the game board (0: empty, 1: black disc, 2: white disc)
-        self.chess_board = np.zeros((self.board_size, self.board_size), dtype=int)
-
-        # Initialize the center discs for Reversi Othello
-        mid = self.board_size // 2
-        self.chess_board[mid - 1][mid - 1] = 2  # White
-        self.chess_board[mid - 1][mid] = 1      # Black
-        self.chess_board[mid][mid - 1] = 1      # Black
-        self.chess_board[mid][mid] = 2          # White
+        # Initialize the game board from file
+        self.chess_board = np.loadtxt(board_fpath, dtype=int, delimiter=',')
 
         # Whose turn to step
         self.turn = 0
@@ -175,7 +165,7 @@ class World:
             try:
                 # Run the agent's step function
                 start_time = time()
-                move_pos = self.get_current_agent().step(
+                move_coords = self.get_current_agent().step( # TODO: THIS SHOULD RETURN MoveCoordinates
                     deepcopy(self.chess_board),
                     cur_player,
                     opponent,
@@ -183,7 +173,7 @@ class World:
                 time_taken = time() - start_time
                 self.update_player_time(time_taken)
 
-                if count_capture(self.chess_board, move_pos, cur_player) == 0:
+                if not check_move_validity(self.chess_board, move_coords, cur_player):
                     raise ValueError(f"Invalid move by player {cur_player}: {move_pos}")
 
             except BaseException as e:

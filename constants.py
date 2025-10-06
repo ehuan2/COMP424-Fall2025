@@ -14,3 +14,4 @@ PLAYER_1_NAME = "Blue"
 PLAYER_2_NAME = "Brown"
 PLAYER_1_COLOR = "tab:blue"  # Black is traditionally used for Player 1
 PLAYER_2_COLOR = "tab:brown"  # White is traditionally used for Player 2
+OBSTACLE_COLOR = "tab:green"

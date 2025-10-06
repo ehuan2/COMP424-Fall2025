@@ -51,6 +51,8 @@ class UIEngine:
                 plt.Circle((x + w / 2, y + w / 2), w / 2.5, color=disc_color)
             )
 
+        # TODO: Add logic for placing obstacles (grey or green square)
+
         # Display text in the box (optional)
         if len(text) > 0:
             plt.text(
@@ -93,6 +95,8 @@ class UIEngine:
                     disc_color = PLAYER_1_COLOR  # Black disc
                 elif chess_board[x_pos, y_pos] == 2:
                     disc_color = PLAYER_2_COLOR  # White disc
+                elif chess_board[x_pos, y_pos] == 3:
+                    disc_color = OBSTACLE_COLOR  # White disc #TODO: Update to square
 
                 # Optional debug text
                 text = ""
