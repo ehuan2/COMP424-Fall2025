@@ -50,7 +50,7 @@ class StudentAgent(Agent):
         for move in legal_moves:
             simulated_board = copy.deepcopy(board)
             execute_move(simulated_board, move, color)
-            _, player_score, opponent_score = check_endgame(simulated_board, color, 3 - color)
+            _, player_score, opponent_score = check_endgame(simulated_board)
             move_score = self.evaluate_board(simulated_board, color, player_score, opponent_score)
 
             if move_score > best_score:

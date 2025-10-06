@@ -37,8 +37,8 @@ class World:
             The registered class of the first player
         player_2: str
             The registered class of the second player
-        board_size: int
-            The size of the board. If None, board_size = a number between MIN_BOARD_SIZE and MAX_BOARD_SIZE
+        board_fpath: str
+            The path to the file to load in as the game board. 
         display_ui : bool
             Whether to display the game board
         display_delay : float
@@ -200,7 +200,7 @@ class World:
         # Change turn
         self.turn = 1 - self.turn
 
-        results = check_endgame(self.chess_board, self.get_current_player(),self.get_current_opponent())
+        results = check_endgame(self.chess_board)
         self.results_cache = results
 
         # Render board and show results

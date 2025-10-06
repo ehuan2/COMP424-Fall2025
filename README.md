@@ -120,7 +120,7 @@ Feel free to open an issue in this repository, or contact us in Ed thread.
 
 ## About
 
-This is a class project for COMP 424, McGill University, Fall 2025 (it was originally forked with the permission of Jackie Cheung).
+This is a class project for COMP 424, McGill University, Fall 2025 (it was originally forked with the permission of Jackie Cheung and David Meger).
 
 ## License
 

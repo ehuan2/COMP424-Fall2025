@@ -6,37 +6,51 @@ Helpers.py is a collection of functions that primarily make up the Ataxx game lo
 Beyond a few things in the World init, which can be copy/pasted this should be almost
 all of what you'll need to simulate games in your search method.
 
+Classes:
+    MoveCoordinates         - a data class for storing (row, column) tuples for both the source and the destination of a move.
+
 Functions:
-    get_directions    - a simple helper to deal with the geometry of Reversi moves
-    count_capture     - how many flips does this move make. Game logic defines valid moves as those with >0 returns from this function. #TODO: Change this
-    count_capture_dir - a helper for the above, unlikely to be used externally
-    execute_move      - update the chess_board by simulating a move
-    flip_disks        - a helper for the above, unlikely to be used externally
-    check_endgame     - check for termination, who's won but also helpful to score non-terminated games
-    get_valid_moves   - use this to get the children in your tree
-    random_move       - basis of the random agent and can be used to simulate play
+    get_directions          - a simple helper to deal with the geometry of single tile moves ("duplications")
+    get_two_tile_directions - a simple helper to deal with the geometry of double tile moves ("jumps")
+    check_move_validity     - is this a valid move for a given player and chess_board
+    count_disc_count_change - how many discs are gained by this moved (flipped or duplicates)
+    execute_move            - update the chess_board by simulating a move
+    check_endgame           - check for termination, who's won but also helpful to score non-terminated games
+    get_valid_moves         - use this to get the children in your tree
+    random_move             - basis of the random agent and can be used to simulate play
 
     For all, the chess_board is an np array of integers, size nxn and integer values indicating square occupancies.
-    The current player is (1: Blue, 2: Brown), 0's in the board mean empty squares.
-    Move pos is a tuple holding [row,col], zero indexed such that valid entries are [0,board_size-1]
+    The current player is (1: Blue, 2: Brown), 0's in the board mean empty squares. 3's in the board mean obstacles.
+    Move coords is MoveCoordinates instance containing two tuples - source and destination. Each tuple holds [row,col], zero indexed 
+    such that valid entries are [0,board_size-1]
 """
 
+
 class MoveCoordinates:
+    """
+    MoveCoordinates is a simple helper to store (row, column) tuples for both the source and the destination of a move.
+    """
     def __init__(self, src: tuple[int,int], dest: tuple[int, int]):
         self.row_src = src[0]
         self.col_src = src[1]
         self.row_dest = dest[0]
         self.col_dest = dest[1]
 
+    '''
+    Return the src tuple
+    '''
     def get_src(self) -> tuple[int, int]:
         return (self.row_src, self.col_src)
     
+    '''
+    Return the destination tuple
+    '''
     def get_dest(self) -> tuple[int, int]:
         return (self.row_dest, self.col_dest)
 
 
 
-def get_directions():
+def get_directions() -> list[tuple]:
     """
     Get all directions (8 directions: up, down, left, right, and diagonals)
 
@@ -47,9 +61,9 @@ def get_directions():
     """
     return [(-1, 0), (1, 0), (0, -1), (0, 1), (-1, -1), (-1, 1), (1, -1), (1, 1)]
 
-def get_two_tile_directions(): 
+def get_two_tile_directions() -> list[tuple]: 
     """
-    Get all directions (8 directions: up, down, left, right, and diagonals)
+    Get all possible movement vectors for a 2 tile move (16 total)
 
     Returns
     -------
@@ -62,7 +76,16 @@ def get_two_tile_directions():
             (-2, -1), (2, -1), (-1, -2), (-1, 2),
             (-2, -2), (-2, 2), (2, -2), (2, 2)] 
 
+
 def check_move_validity(chess_board, move_coords: MoveCoordinates, player: int) -> bool:
+    """
+    Check if the move described by move_coords is valid given player and chess_board
+
+    Returns
+    -------
+    bool
+        Whether the move is valid.
+    """
     src_tile = move_coords.get_src()
     dest_tile = move_coords.get_dest()
 
@@ -93,12 +116,12 @@ def check_move_validity(chess_board, move_coords: MoveCoordinates, player: int) 
 
 def count_disc_count_change(chess_board, move_coords: MoveCoordinates, player: int):
     """
-    How many discs are gained by the move specified in move_coords. Total = opponent's discs are captured + duplication disc for single tile moves
+    How many discs are gained by the move specified in move_coords. Total = (opponent's discs captured) + (duplication disc for single tile moves)
 
     Returns
     -------
     int
-        The number of stones that will be captured making this move, including all directions.
+        The change in player disc count from this move.
         -1 indicates any form of invalid move.
     """
     opponent_map = {0: 1, 1: 0} # This lets us quickly access the value corresponding to the opponent on the board based on current player number
@@ -161,7 +184,7 @@ def execute_move(chess_board, move_coords: MoveCoordinates, player: int):
         chess_board[r_src, c_src] = 0
 
 
-def check_endgame(chess_board,player,opponent):
+def check_endgame(chess_board):
     """
     Check if the game ends and compute the final score. 
     
@@ -186,14 +209,14 @@ def check_endgame(chess_board,player,opponent):
     p1_score = np.sum(chess_board == 2)
     return is_endgame, p0_score, p1_score
 
-def get_valid_moves(chess_board,player):
+def get_valid_moves(chess_board,player:int) -> list[MoveCoordinates]:
     """
     Get all valid moves given the chess board and player.
 
     Returns
 
     -------
-    valid_moves : [(tuple)]
+    valid_moves : [MoveCoordinates]
 
     """
 
@@ -216,19 +239,19 @@ def get_valid_moves(chess_board,player):
 
     return valid_moves
 
-def random_move(chess_board, player):
+def random_move(chess_board, player: int) -> MoveCoordinates:
     """
     random move from the list of valid moves.
 
     Returns
 
     ------
-    (tuple)
+    MoveCoordinates
 
 
     """
 
-    valid_moves = get_valid_moves(chess_board,player)
+    valid_moves = get_valid_moves(chess_board, player)
 
     if len(valid_moves) == 0:
         # If no valid moves are available, return None

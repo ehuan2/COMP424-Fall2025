@@ -66,8 +66,8 @@ class Simulator:
         ----------
         swap_players : bool
             if True, swap the players
-        board_size : int
-            if not None, set the board size
+        board_fpath : str
+            if not None, set the board to the layout in the file stored at board_fpath
         """
         if board_fpath is None:
             board_fpath = self.args.board_path

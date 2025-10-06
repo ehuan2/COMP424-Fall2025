@@ -28,8 +28,8 @@ class HumanAgent(Agent):
 
         Returns
         -------
-        move_pos : tuple of int
-            The position (r,c) where the player places the disc.
+        move_coords : MoveCoordinates instance
+            The positions of the source and destination
         """
         text = input("Your move (src_row, src_column, dest_row, dest_column) or input q to quit: ")
         while len(text.split(",")) != 4 and "q" not in text.lower():
