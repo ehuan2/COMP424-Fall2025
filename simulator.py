@@ -14,18 +14,23 @@ def get_args():
     parser = argparse.ArgumentParser()
     parser.add_argument("--player_1", type=str, default="random_agent")
     parser.add_argument("--player_2", type=str, default="random_agent")
-    parser.add_argument("--board_size", type=int, default=None)
+    parser.add_argument(
+        "--board_size",
+        type=int,
+        default=None,
+        help="Board size. If not specified, chooses a random size within the range."
+    )
     parser.add_argument(
         "--board_size_min",
         type=int,
         default=6,
-        help="In autoplay mode, the minimum board size",
+        help="The minimum board size for autoplay mode",
     )
     parser.add_argument(
         "--board_size_max",
         type=int,
         default=12,
-        help="In autoplay mode, the maximum board size",
+        help="The maximum board size for autoplay mode",
     )
     parser.add_argument("--display", action="store_true", default=False)
     parser.add_argument("--display_delay", type=float, default=0.4)
@@ -49,31 +54,32 @@ class Simulator:
     def __init__(self, args):
         self.args = args
         # Only play on even-sized boards
-        self.valid_board_sizes = [ i for i in range(self.args.board_size_min, self.args.board_size_max+1) if i % 2 == 0 ]
-        #print("Valid sizes: ",self.valid_board_sizes)
+        self.valid_board_sizes = [
+            i for i in range(self.args.board_size_min, self.args.board_size_max+1)
+            if i % 2 == 0
+        ]
 
     def reset(self, swap_players=False, board_size=None):
         """
-        Reset the game
+        Resets the game.
 
         Parameters
         ----------
         swap_players : bool
-            if True, swap the players
+            Flag to swap the players
         board_size : int
-            if not None, set the board size
+            Sets the board size
         """
-        if board_size is None:
-            board_size = self.args.board_size
-        if swap_players:
-            player_1, player_2 = self.args.player_2, self.args.player_1
-        else:
-            player_1, player_2 = self.args.player_1, self.args.player_2
+        player_1, player_2 = (
+            (self.args.player_1, self.args.player_2)
+            if swap_players else
+            (self.args.player_2, self.args.player_1)
+        )
 
         self.world = World(
             player_1=player_1,
             player_2=player_2,
-            board_size=board_size,
+            board_size=self.args.board_size if board_size is None else board_size,
             display_ui=self.args.display,
             display_delay=self.args.display_delay,
             display_save=self.args.display_save,
@@ -82,49 +88,76 @@ class Simulator:
         )
 
     def run(self, swap_players=False, board_size=None):
+        """
+        Run the game for one iteration.
+
+        Parameters
+        ----------
+        swap_players : bool
+            Flag to swap the players
+        board_size : int
+            Sets the board size
+
+        Outputs
+        ----------
+        p1_score: int
+            The game score for player 1.
+        p2_score: int
+            The game score for player 2.
+        p1_time: List[float]
+            All the times that player 1 took.
+        p2_time: List[float]
+            All the times that player 2 took.
+        """
         self.reset(swap_players=swap_players, board_size=board_size)
-        is_end, p0_score, p1_score = self.world.step()
+        is_end, p1_score, p2_score = self.world.step()
         while not is_end:
-            is_end, p0_score, p1_score = self.world.step()
+            is_end, p1_score, p2_score = self.world.step()
+
         logger.info(
-            f"Run finished. {PLAYER_1_NAME} player, agent {self.args.player_1}: {p0_score}. {PLAYER_2_NAME}, agent {self.args.player_2}: {p1_score}"
+            f'''Run finished.
+            {PLAYER_1_NAME} player, agent "{self.args.player_1}" score: {p1_score}.
+            {PLAYER_2_NAME} player, agent "{self.args.player_2}" score: {p2_score}.
+            '''
         )
-        return p0_score, p1_score, self.world.p0_time, self.world.p1_time
+
+        if swap_players:
+            return p2_score, p1_score, self.world.p2_time, self.world.p1_time
+
+        return p1_score, p2_score, self.world.p1_time, self.world.p2_time
 
     def autoplay(self):
         """
         Run multiple simulations of the gameplay and aggregate win %
         """
+        if self.args.display:
+            logger.warning("Since running autoplay mode, display will be disabled")
+        self.args.display = False
+
         p1_win_count = 0
         p2_win_count = 0
         p1_times = []
         p2_times = []
-        if self.args.display:
-            logger.warning("Since running autoplay mode, display will be disabled")
-        self.args.display = False
         with all_logging_disabled():
             for i in range(self.args.autoplay_runs):
                 swap_players = i % 2 == 0
-                board_size = self.valid_board_sizes[ np.random.randint(len(self.valid_board_sizes)) ] 
-                p0_score, p1_score, p0_time, p1_time = self.run(
+                board_size = self.valid_board_sizes[
+                    np.random.randint(len(self.valid_board_sizes))
+                ]
+                p1_score, p2_score, p1_time, p2_time = self.run(
                     swap_players=swap_players, board_size=board_size
                 )
-                if swap_players:
-                    p0_score, p1_score, p0_time, p1_time = (
-                        p1_score,
-                        p0_score,
-                        p1_time,
-                        p0_time,
-                    )
-                if p0_score > p1_score:
+
+                if p1_score > p2_score:
                     p1_win_count += 1
-                elif p0_score < p1_score:
+                elif p1_score < p2_score:
                     p2_win_count += 1
                 else:  # Tie
                     p1_win_count += 0.5
                     p2_win_count += 0.5
-                p1_times.extend(p0_time)
-                p2_times.extend(p1_time)
+
+                p1_times.extend(p1_time)
+                p2_times.extend(p2_time)
 
         logger.info(
             f"Player 1, agent {self.args.player_1}, win percentage: {p1_win_count / self.args.autoplay_runs}. Maximum turn time was {np.round(np.max(p1_times),5)} seconds."

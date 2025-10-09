@@ -63,18 +63,18 @@ class World:
                 f"Agent '{player_2}' is not registered. {AGENT_NOT_FOUND_MSG}"
             )
 
-        p0_agent = AGENT_REGISTRY[player_1]
-        p1_agent = AGENT_REGISTRY[player_2]
-        logger.info(f"Registering p0 agent : {player_1}")
-        self.p0 = p0_agent()
-        logger.info(f"Registering p1 agent : {player_2}")
+        p1_agent = AGENT_REGISTRY[player_1]
+        p2_agent = AGENT_REGISTRY[player_2]
+        logger.info(f"Registering p1 agent : {player_1}")
         self.p1 = p1_agent()
+        logger.info(f"Registering p2 agent : {player_2}")
+        self.p2 = p2_agent()
 
         # check autoplay
         if autoplay:
-            if not self.p0.autoplay or not self.p1.autoplay:
+            if not self.p1.autoplay or not self.p2.autoplay:
                 raise ValueError(
-                    f"Autoplay mode is not supported by one of the agents ({self.p0} -> {self.p0.autoplay}, {self.p1} -> {self.p1.autoplay}). Please set autoplay=True in the agent class."
+                    f"Autoplay mode is not supported by one of the agents ({self.p1} -> {self.p1.autoplay}, {self.p2} -> {self.p2.autoplay}). Please set autoplay=True in the agent class."
                 )
 
         self.player_names = {PLAYER_1_ID: PLAYER_1_NAME, PLAYER_2_ID: PLAYER_2_NAME}
@@ -103,8 +103,8 @@ class World:
         self.turn = 0
 
         # Time taken by each player
-        self.p0_time = []
         self.p1_time = []
+        self.p2_time = []
 
         # Cache to store and use the data
         self.results_cache = ()
@@ -144,9 +144,9 @@ class World:
             Time taken by the player
         """
         if not self.turn:
-            self.p0_time.append(time_taken)
-        else:
             self.p1_time.append(time_taken)
+        else:
+            self.p2_time.append(time_taken)
 
     def step(self):
         """
@@ -229,7 +229,7 @@ class World:
         agent : object
             The agent object of the current player
         """
-        return self.p0 if self.turn == 0 else self.p1
+        return self.p1 if self.turn == 0 else self.p2
 
     def render(self, debug=False):
         """
@@ -240,7 +240,7 @@ class World:
 
 if __name__ == "__main__":
     world = World()
-    is_end, p0_score, p1_score = world.step()
+    is_end, p1_score, p2_score = world.step()
     while not is_end:
-        is_end, p0_score, p1_score = world.step()
-    print(p0_score, p1_score)
+        is_end, p1_score, p2_score = world.step()
+    print(p1_score, p2_score)
