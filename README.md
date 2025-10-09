@@ -1,4 +1,4 @@
-# Reversi/Othello!
+# ATAXX
 
 **Project Description & Template** : https://www.overleaf.com/read/vnygbjryrxrt#7b70cb
 
@@ -7,22 +7,33 @@
 </p>
 
 ## Setup
+To setup your Python environment, we highly suggest using virtualenv to keep your dependencies in order. Run:
+```bash
+python3 -m venv venv
+```
+and then:
+```
+source venv/bin/activate
+```
+to create and activate your virtual environment. Note: You will need to activate your virtual environment every time you start a new shell. It should appear as:
+```
+(venv) <username@machine>:~/your/path/to/project$ 
+```
 
-To setup the game, clone this repository and install the dependencies:
-
+To setup the game, clone this repository and install the dependencies. Be sure to have your virtual environment activated.
 ```bash
 pip install -r requirements.txt
 ```
 
 ## Playing a game
 
-To start playing a game, we will run the simulator and specify which agents should complete against eachother. To start, several agents are given to you, and you will add your own following the same game interface. For example, to play the game using two copies of the provided random agent (which takes a random action every turn), run the following:
+The simulator requires you to specify which agents should compete against each other. As a starting point, we provide you with several agents, and your goal is to add your own following the same game interface. To play the game using two copies of the provided random agent (which takes a random action every turn), run the following:
 
 ```bash
 python simulator.py --player_1 random_agent --player_2 random_agent
 ```
 
-This will spawn a random game board of size NxN, and run the two agents of class [RandomAgent](agents/random_agent.py). You will be able to see their moves in the console.
+This will spawn a random game board of size $N \times N$, and run the two agents of class [RandomAgent](agents/random_agent.py). You will be able to see their moves in the console.
 
 ## Visualizing a game
 
