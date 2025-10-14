@@ -207,6 +207,15 @@ def check_endgame(chess_board):
 
     p0_score = np.sum(chess_board == 1)
     p1_score = np.sum(chess_board == 2)
+
+    # Handle special case where one player is totally eliminated
+    if p0_score == 0:
+        p1_score = chess_board.shape[0] * chess_board.shape[1]
+        is_endgame = True
+    elif p1_score == 0:
+        p0_score = chess_board.shape[0] * chess_board.shape[1]
+        is_endgame = True
+
     return is_endgame, p0_score, p1_score
 
 def get_valid_moves(chess_board,player:int) -> list[MoveCoordinates]:
