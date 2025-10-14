@@ -9,18 +9,19 @@ import logging
 from store import AGENT_REGISTRY
 from constants import *
 import sys
-from helpers import count_capture, execute_move, check_endgame, random_move, get_valid_moves
+from helpers import check_move_validity, execute_move, check_endgame, random_move, get_valid_moves, MoveCoordinates
 
 logging.basicConfig(format="%(levelname)s:%(message)s", level=logging.INFO)
 
 logger = logging.getLogger(__name__)
+
 
 class World:
     def __init__(
         self,
         player_1="random_agent",
         player_2="random_agent",
-        board_size=None,
+        board_fpath=None,
         display_ui=False,
         display_delay=0.4,
         display_save=False,
@@ -36,8 +37,8 @@ class World:
             The registered class of the first player
         player_2: str
             The registered class of the second player
-        board_size: int
-            The size of the board. If None, board_size = a number between MIN_BOARD_SIZE and MAX_BOARD_SIZE
+        board_fpath: str
+            The path to the file to load in as the game board. 
         display_ui : bool
             Whether to display the game board
         display_delay : float
@@ -79,25 +80,19 @@ class World:
 
         self.player_names = {PLAYER_1_ID: PLAYER_1_NAME, PLAYER_2_ID: PLAYER_2_NAME}
 
-        if board_size is None:
-            # Random board size, ensuring even numbers for Reversi Othello
-            self.board_size = np.random.choice([6, 8, 10, 12])
+        if board_fpath is None:
+            # Default to empty board
+            self.board_fpath = "boards/empty_7x7.csv"
             logger.info(
-                f"No board size specified. Randomly generating size: {self.board_size}x{self.board_size}"
+                f"No board path specified. Using empty board at {self.board_fpath}"
             )
         else:
-            self.board_size = board_size
-            logger.info(f"Setting board size to {self.board_size}x{self.board_size}")
+            self.board_fpath = board_fpath
+            logger.info(f"Setting board path to {self.board_fpath}")
 
-        # Initialize the game board (0: empty, 1: black disc, 2: white disc)
-        self.chess_board = np.zeros((self.board_size, self.board_size), dtype=int)
-
-        # Initialize the center discs for Reversi Othello
-        mid = self.board_size // 2
-        self.chess_board[mid - 1][mid - 1] = 2  # White
-        self.chess_board[mid - 1][mid] = 1      # Black
-        self.chess_board[mid][mid - 1] = 1      # Black
-        self.chess_board[mid][mid] = 2          # White
+        # Initialize the game board from file
+        self.chess_board = np.loadtxt(self.board_fpath, dtype=int, delimiter=',')
+        self.board_size = self.chess_board.shape[0] # We assume it is always square
 
         # Whose turn to step
         self.turn = 0
@@ -148,7 +143,7 @@ class World:
         else:
             self.p1_time.append(time_taken)
 
-    def step(self):
+    def step(self): 
         """
         Take a step in the game world.
         Runs the agents' step function and updates the game board accordingly.
@@ -162,7 +157,7 @@ class World:
         cur_player = self.get_current_player()
         opponent = self.get_current_opponent()
 
-        valid_moves = get_valid_moves(self.chess_board,cur_player)
+        valid_moves = get_valid_moves(self.chess_board, cur_player)
 
         if not valid_moves:
             logger.info(f"Player {self.player_names[self.turn]} must pass due to having no valid moves.")
@@ -171,7 +166,7 @@ class World:
             try:
                 # Run the agent's step function
                 start_time = time()
-                move_pos = self.get_current_agent().step(
+                move_coords = self.get_current_agent().step( # We expect this to return MoveCoordinates
                     deepcopy(self.chess_board),
                     cur_player,
                     opponent,
@@ -179,8 +174,8 @@ class World:
                 time_taken = time() - start_time
                 self.update_player_time(time_taken)
 
-                if count_capture(self.chess_board, move_pos, cur_player) == 0:
-                    raise ValueError(f"Invalid move by player {cur_player}: {move_pos}")
+                if not check_move_validity(self.chess_board, move_coords, cur_player):
+                    raise ValueError(f"Invalid move by player {cur_player}: SRC {move_coords.get_src()}, DEST {move_coords.get_dest()}")
 
             except BaseException as e:
                 ex_type = type(e).__name__
@@ -194,18 +189,18 @@ class World:
                     )
                 )
                 print("Executing Random Move!")
-                move_pos = random_move(self.chess_board,cur_player)
+                move_coords = random_move(self.chess_board,cur_player)
 
             # Execute move
-            execute_move(self.chess_board,move_pos, cur_player)
+            execute_move(self.chess_board,move_coords, cur_player)
             logger.info(
-                f"Player {self.player_names[self.turn]} places at {move_pos}. Time taken this turn (in seconds): {time_taken}"
+                f"Player {self.player_names[self.turn]} places at SRC {move_coords.get_src()}, DEST {move_coords.get_dest()}. Time taken this turn (in seconds): {time_taken}"
             )
 
         # Change turn
         self.turn = 1 - self.turn
 
-        results = check_endgame(self.chess_board, self.get_current_player(),self.get_current_opponent())
+        results = check_endgame(self.chess_board)
         self.results_cache = results
 
         # Render board and show results
