@@ -15,22 +15,33 @@
 
 
 ## Setup
+To setup your Python environment, we highly suggest using virtualenv to keep your dependencies in order. Run:
+```bash
+python3 -m venv venv
+```
+and then:
+```
+source venv/bin/activate
+```
+to create and activate your virtual environment. Note: You will need to activate your virtual environment every time you start a new shell. It should appear as:
+```
+(venv) <username@machine>:~/your/path/to/project$ 
+```
 
-To setup the game, clone this repository and install the dependencies:
-
+To setup the game, clone this repository and install the dependencies. Be sure to have your virtual environment activated.
 ```bash
 pip install -r requirements.txt
 ```
 
 ## Playing a game
+The simulator requires you to specify which agents should compete against each other. As a starting point, we provide you with several agents that uses the game interface. Following these examples, your goal is to add your own agents using the techniques taught in class. 
 
-To start playing a game, we will run the simulator and specify which agents should complete against eachother. To start, several agents are given to you, and you will add your own following the same game interface. For example, to play the game using two copies of the provided random agent (which takes a random action every turn), run the following:
-
+For example, to play the game using two copies of the provided random agent (which takes a random action every turn), run the following:
 ```bash
 python simulator.py --player_1 random_agent --player_2 random_agent
 ```
 
-This will spawn a random game board of size NxN, and run the two agents of class [RandomAgent](agents/random_agent.py). You will be able to see their moves in the console.
+This will spawn a random game board of size $N \times N$, and run the two agents of class [RandomAgent](agents/random_agent.py). You will be able to see their moves in the console.
 
 ## Visualizing a game
 
@@ -49,14 +60,13 @@ python simulator.py --player_1 human_agent --player_2 random_agent --display
 ```
 
 ## Autoplaying multiple games
-
-There is some randomness (coming from the initial game setup and potentially agent logic), so to fairly evaluate agents, we will run them against eachother multiple times, alternating their roles as player_1 and player_2, on various board sizes that are selected randomly (between size 6 and 12). The aggregate win % will determine a fair winner. Use the `--autoplay` flag to run $n$ games sequentially, where $n$ can be set using `--autoplay_runs`.
+There is some randomness affecting the outcome of the game from the initial layout and agent logic. To fairly evaluate agents, we will run them against each other multiple times, alternating their roles as player_1 and player_2, and on various board sizes that are selected randomly (between size 6 and 12). The aggregate win percentage will determine a fair winner. Use the `--autoplay` flag to run $n$ games sequentially, where $n$ can be set using `--autoplay_runs`. The default is 100, and will be used for the final player vs. player run.
 
 ```bash
 python simulator.py --player_1 random_agent --player_2 random_agent --autoplay
 ```
 
-During autoplay, boards are drawn randomly from `--board_roster_dir` for each iteration. You may try various ranges for your own information and development by providing these variables on the command-line. However, the defaults (to be used during grading) are in the `boards/` folder in this repository, so ensure the timing limits are satisfied for every board in this size range. 
+During autoplay, boards are drawn randomly from `--board_roster_dir` for each iteration. You may test and develop on various setups by providing this board directory path to the command line. However, the defaults will be used during testnig and can be found in the `boards/` folder. Please ensure the timing limits are satisfied for every board in this size range. 
 
 **Notes**
 
@@ -65,33 +75,43 @@ During autoplay, boards are drawn randomly from `--board_roster_dir` for each it
 
 ## Develop your own general agent(s):
 
-You need to write one agent and submit it for the class project, but you may develop additional agents during the development process to play against eachother, gather data or similar. To write a general agent:
+You need to write one agent and submit it for the class project, but you may develop additional agents during the development process to play against each other, gather data or similar. To write a general agent:
 
 1. Modify **ONLY** the [`student_agent.py`](agents/student_agent.py) file in [`agents/`](agents/) directory, which extends the [`agents.Agent`](agents/agent.py) class.
 2. Do not add any additional imports.
-3. Implement the `step` function with your game logic. Make extensive use of the functions imported from helpers.py which should be the majority of what you need to interact with the game. Any further logic can be coded directly in your file as global or class variables, functions, etc. Do not import world.py.
-4. Test your performance against the random_agent with ```bash
-python simulator.py --player_1 student_agent --player_2 random_agent --autoplay```
-5. Try playing against your own bot as a human. Consistently beating your own best-effort human play is a very good indicator of an A performance grade.
+3. Implement the `step` function with your game logic. Make extensive use of the functions imported from helpers.py which should be the majority of what you need to interact with the game. Any further logic can be coded directly in your file as global or class variables, functions, etc. **Do not import world.py.**
+4. Test your performance against the random_agent with:
+```
+python simulator.py --player_1 student_agent --player_2 random_agent --autoplay
+```
+5. Try playing against your own bot as a human. Consistently beating your own best-effort human play is a very good indicator of an A grade for the performance section.
 
 ## Advanced and optional: What if I want to create other agents and test them against eachother?
+There can only be one file called `student_agent.py` which is already perfectly set up to interact with our evaluation code. You may create other agents during development for testing, which requires a few extra setup steps.
 
-There can only be one file called student_agent.py, and that's already perfectly set up to interact with our evaluation code, but you may create other agents during development. To get new files interacting correctly, you need to change a few specific things. Let's suppose you want to create second_agent.py, a second try at your student agent.
-
-1. Create the new file by starting from a copy of the provided student_agent. ```$ cp agents/student_agent.py agents/second_agent.py```
-2. Change the name in the decorator. Edit (@register_agent("student_agent")) instead to @register_agent("second_agent"), and the class name from `StudentAgent` to `SecondAgent`. 
+Suppose you want to create `second_agent.py`, a second strategy for your student agent:
+1. Create the new file by starting from a copy of the provided student agent:
+```
+cp agents/student_agent.py agents/second_agent.py
+```
+2. Change the name in the decorator. Edit `@register_agent("student_agent")` to `@register_agent("second_agent")` and the class name from `StudentAgent` to `SecondAgent`. 
 3. Import your new agent in the [`__init__.py`](agents/__init__.py) file in [`agents/`](agents/) directory, by adding the line `from .second_agent import SecondAgent`
-4. Now you can pit your two agents against each other in the simulator.py by running ```bash python simulator.py --player_1 student_agent --player_2 second_agent --display``` and see which idea is working better.
-5. Adapt all of the above to create even more agents
+4. Now you can run your two agents against each other in the simulator.py by running:
+```
+python simulator.py --player_1 student_agent --player_2 second_agent --display
+```
     
-## To wrap up and get ready to submit, prepare the strongest player you have found in the student_agent.py file, to be handed in for performance evaluation:
+Adapt these steps to any number of agents for your different ideas.
 
-You will submit only one code file for grading: student_agent.py. Here are a few last minute things to double-check, since your agent must follow some special rules to make it possible to run in auto-grading. Failing to follow the instructions below precisely risks an automatic assignment of "poor" for the performance grade as we don't have time to debug everyone's solution.
+## Submission
+To wrap up and submit, prepare the strongest player you developed by adding it to the `student_agent.py` file. This will be the only code file submitted for grading.
 
-1. Check that you didn't modify anything outside of student_agent. You can use git status and git diff for this.
-2. Ensure student_agent does not have any additional imports.
-3. The `StudentAgent` class *must be* decorated with exactly the name `student_agent`. Do not add any comments or change that line at all, as we will be interacting with it via scripting as we auto-run your agents in the tournament. (Common mistake if you did most of your dev in a differently named file, best_agent, or similar, and then copied the contents without checking).
-4. Check the time limits are satisfied for all board sizes in the range 6-12, inclusive.
+Here are a few last minute things to double-check, since your agent must follow some special rules to make it possible to run in auto-grading. **Failing to precisely follow the instructions below risks an automatic assignment of "poor" for the performance grade** as we don't have time to debug everyone's solution.
+
+1. Check that you didn't modify anything outside of `student_agent.py`. You can use `git status` and `git diff` to accomplish this.
+2. Ensure `student_agent.py` does not have any additional imports.
+3. The `StudentAgent` class *must be* decorated with the exact name of `student_agent`. Do not add any comments or change that line at all, as we will be need it to run your agents in the tournament. A common mistake is to copy the contents from a differently named file, e.g.: `best_agent` or similar, without checking.
+4. Check that the time limits are satisfied for all board sizes in the range 6-12, inclusive.
 5. As a final test before submitting, make 100% sure the player you wish to be evaluated on runs correctly with the exact command we'll use in auto-grading ```python simulator.py --player_1 random_agent --player_2 student_agent --autoplay```
 
 ## Full API
