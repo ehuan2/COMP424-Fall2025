@@ -2,18 +2,6 @@
 
 **Project Description & Template** : https://www.overleaf.com/read/khdfckprxqtn#a952b1
 
-## TODO AS TAs:
-- Update helpers.py [DONE ]
-- Update simulator.py [DONE ]
-- Update UI.py to add obstacles [MOSTLY DONE]
-- Create pre-made maps, instead of varying board size [DONE ]
-- Test random agent
-- test autoplay with multiple boards
-- Add GPTAgent
-- Edit documentation to match 
-- Update requirements.txt 
-
-
 ## Setup
 To setup your Python environment, we highly suggest using virtualenv to keep your dependencies in order. Run:
 ```bash

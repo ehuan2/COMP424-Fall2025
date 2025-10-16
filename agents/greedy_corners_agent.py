@@ -1,13 +1,5 @@
 # greedy_corners_agent.py
 #
-# This file is the direct output of ChatGPT. You can start from 
-# a prompt you give to GPT and likely can get even better play than this one.
-# You will have to cite your sources including providing the full prompt you used
-# as your starting point in the report, but there is no penalty for doing so.
-# 
-# We have played all GPT agents we could get against code written by real human
-# AI designers. We think most of the 424 students can outperform what GPT has to 
-# offer, but you are free to use whatever method you find most suitable!
 #
 
 from agents.agent import Agent
@@ -17,7 +9,7 @@ import copy
 import random
 import numpy as np
 
-@register_agent("gpt_greedy_corners_agent")
+@register_agent("greedy_corners_agent")
 class StudentAgent(Agent):
     """
     A simple Ataxx agent using a greedy heuristic: maximize piece difference, corner control, and minimize opponent mobility.
@@ -25,7 +17,7 @@ class StudentAgent(Agent):
 
     def __init__(self):
         super().__init__()
-        self.name = "gpt_greedy_corners_agent"
+        self.name = "greedy_corners_agent"
 
     def step(self, board, color, opponent):
         """
@@ -87,6 +79,3 @@ class StudentAgent(Agent):
         opp_moves = len(get_valid_moves(board, opponent))
         mobility_penalty = -opp_moves
         return score_diff + corner_bonus + mobility_penalty
-
-# Ensure to test with:
-# python simulator.py --player_1 student_agent --player_2 random_agent --display
