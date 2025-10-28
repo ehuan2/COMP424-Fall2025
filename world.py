@@ -96,6 +96,11 @@ class World:
 
         # Whose turn to step
         self.turn = 0
+        
+        # Move count to keep track of, as a limit
+        self.move_count = 0
+        # we limit the number of moves to three times the board_size^2 (number of squares)
+        self.MOVE_COUNT_LIMIT = 3 * (self.board_size ** 2)
 
         # Time taken by each player
         self.p0_time = []
@@ -200,7 +205,13 @@ class World:
         # Change turn
         self.turn = 1 - self.turn
 
-        results = check_endgame(self.chess_board)
+        # check to see if it's over, then increment the move count
+        self.move_count += 1
+
+        is_endgame, p0_score, p1_score = check_endgame(self.chess_board)
+        is_endgame = is_endgame or self.move_count >= self.MOVE_COUNT_LIMIT
+
+        results = (is_endgame, p0_score, p1_score)
         self.results_cache = results
 
         # Render board and show results
