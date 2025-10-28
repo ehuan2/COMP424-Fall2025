@@ -99,7 +99,8 @@ class World:
         
         # Move count to keep track of, as a limit
         self.move_count = 0
-        self.MOVE_COUNT_LIMIT = 3 * (self.board_size ** 2) # limit this to 2 x board size
+        # we limit the number of moves to three times the board_size^2 (number of squares)
+        self.MOVE_COUNT_LIMIT = 3 * (self.board_size ** 2)
 
         # Time taken by each player
         self.p0_time = []
