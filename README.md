@@ -122,6 +122,28 @@ optional arguments:
   --autoplay_runs AUTOPLAY_RUNS
 ```
 
+## GitHub Cloning Instructions
+Because you would likely want to create your own private GitHub repository for this project, but are unable to due to this repository being public, I would suggest for you to follow the instructions below:
+1. Clone the repository doing:
+SSH cloning
+```
+git clone git@github.com:davaus80/COMP424-Fall2025.git
+```
+or HTTPS cloning:
+```
+git clone https://github.com/davaus80/COMP424-Fall2025.git
+```
+2. Create your own private repository on GitHub and add your partners following: https://docs.github.com/en/repositories/creating-and-managing-repositories/creating-a-new-repository and https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/repository-access-and-collaboration/inviting-collaborators-to-a-personal-repository
+3. Add this repository as a remote repository:
+```
+git remote add private <your-github-repo-link>
+```
+4. Push to your remote as:
+```
+git push private main
+```
+And then you should continue using this as you update your changes!
+
 ## Issues? Bugs? Questions?
 
 Feel free to open an issue in this repository, or contact us in Ed thread.
