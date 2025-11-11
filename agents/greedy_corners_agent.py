@@ -51,9 +51,6 @@ class StudentAgent(Agent):
                 best_score = move_score
                 best_move = move
 
-        # now let's count the move change:
-        print(f'change: {count_disc_count_change(board, best_move, color)}')
-
         # Return the best move found (or random fallback)
         return best_move or random.choice(legal_moves)
 
