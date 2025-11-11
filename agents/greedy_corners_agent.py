@@ -4,7 +4,7 @@
 
 from agents.agent import Agent
 from store import register_agent
-from helpers import get_valid_moves, execute_move, count_disc_count_change
+from helpers import get_valid_moves, execute_move
 import copy
 import random
 import numpy as np
