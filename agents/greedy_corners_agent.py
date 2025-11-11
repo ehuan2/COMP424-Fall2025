@@ -4,7 +4,7 @@
 
 from agents.agent import Agent
 from store import register_agent
-from helpers import get_valid_moves, execute_move
+from helpers import get_valid_moves, execute_move, count_disc_count_change
 import copy
 import random
 import numpy as np
@@ -50,6 +50,9 @@ class StudentAgent(Agent):
             if move_score > best_score:
                 best_score = move_score
                 best_move = move
+
+        # now let's count the move change:
+        print(f'change: {count_disc_count_change(board, best_move, color)}')
 
         # Return the best move found (or random fallback)
         return best_move or random.choice(legal_moves)

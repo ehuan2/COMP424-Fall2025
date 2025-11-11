@@ -128,7 +128,7 @@ def count_disc_count_change(chess_board, move_coords: MoveCoordinates, player: i
 
     r_dest, c_dest = move_coords.get_dest()
 
-    if not check_move_validity(chess_board, move_coords):
+    if not check_move_validity(chess_board, move_coords, player):
         return -1
     
     discs_gained = 0
@@ -142,7 +142,7 @@ def count_disc_count_change(chess_board, move_coords: MoveCoordinates, player: i
             return -1
 
         # If the tile, is an opponent, count it
-        if chess_board[adj_tile[0], adj_tile[1]] == opponent_map(player):
+        if chess_board[adj_tile[0], adj_tile[1]] == opponent_map[player]:
             discs_gained += 1
 
     # If the move is single tile, count an extra disc for "duplication"
